@@ -5,9 +5,10 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Box.H>
 
-#define UPDATE_RATE 0.05
+#define UPDATE_RATE 0.01
 class Fl_Draw_Box: public Fl_Box {
-    unsigned char* pixbuf; 
+    unsigned char* pixbuf;
+    int fps=0; 
     void draw();
     ~Fl_Draw_Box();
 public:

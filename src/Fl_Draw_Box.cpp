@@ -1,6 +1,8 @@
 #include "Fl_Draw_Box.h"
 #include <stdio.h>
 #include <time.h>
+#include <chrono>
+#include <iostream>
 
 // TIMER CALLBACK: CALLED TO UPDATE THE DRAWING
 static void RenderImage_CB(void *userdata) {
@@ -11,7 +13,7 @@ static void RenderImage_CB(void *userdata) {
 
 
 Fl_Draw_Box::Fl_Draw_Box(int x, int y, int w, int h):
-        Fl_Box(x,y,w,h,""){
+        Fl_Box(x,y,w,h,"1234567"){
             const int ysize = this->h();
             const int xsize = this->w();
             Fl_Draw_Box::pixbuf = new unsigned char[ysize * xsize * 3];
@@ -29,6 +31,9 @@ void Fl_Draw_Box::draw(){
     const int ysize = this->h();
     const int xsize = this->w();
     fl_draw_image(Fl_Draw_Box::pixbuf, x, y, xsize, ysize, 3, xsize*3);
+    std::string s = std::to_string((1.0 / Fl_Draw_Box::fps) * 1000000);
+    this->copy_label(s.c_str());
+    this->draw_label();
         //Fl_Box::draw();
         // int x = this->x();//x position of top left point (from left to right)
         // int y = this->y();//y position of top left point (from top to bottom)
@@ -66,6 +71,7 @@ void Fl_Draw_Box::PlotPixel(int x, int y, unsigned char r, unsigned char g, unsi
 
 // MAKE A NEW PICTURE IN THE PIXEL BUFFER
 void Fl_Draw_Box::RenderImage() {
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     static unsigned char drawcount = 0;
     const int ysize = this->h();
     const int xsize = this->w();
@@ -75,4 +81,8 @@ void Fl_Draw_Box::RenderImage() {
             //Fl_Draw_Box::PlotPixel(x, y, 255, 0, 0);
     ++drawcount;
     Fl_Draw_Box::redraw();
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    Fl_Draw_Box::fps = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    //std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+    //std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
 }
